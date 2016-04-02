@@ -1,0 +1,5 @@
+{
+  :scccw-port 10101
+  :nrepl-port 10102
+  :user-config "scccw.config"
+}
