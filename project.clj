@@ -1,4 +1,4 @@
-(defproject net.reborg/yourprjname "0.0.1"
+(defproject net.reborg/scccw "0.0.1"
   :description "Simple Clojure Components Config Web"
   :url "https://github.com/reborg/scccw"
   :license {:name "Eclipse Public License - v 1.0"
@@ -29,10 +29,10 @@
                  [ring/ring-json "0.4.0"]
                  [ring/ring-defaults "0.1.5"]
                  ]
-  :uberjar-name "yourprjname.jar"
+  :uberjar-name "scccw.jar"
   :repl-options {:init-ns user
                  :init (do (require 'midje.repl) (midje.repl/autotest))}
-  :profiles {:uberjar {:main net.reborg.yourprjname.system
+  :profiles {:uberjar {:main net.reborg.scccw.system
                        :aot :all}
              :dev {:plugins [[lein-midje "3.1.3"]]
                    :dependencies [[midje "1.6.3"]]

@@ -1,6 +1,6 @@
 # Simple Clojure +Components +Config +Web
 
-This is the template I use to start other projects. Call me old-school but:
+This is the template I use to start other projects. Call me old-school but the few bash replacements below solves 95% of my "start a new project" problems.
 
 ```
 git clone http://github.com/reborg/scccw
@@ -16,6 +16,6 @@ for f in `grep -lr "" *` ; do sed "s.Scccw.Yourprjname.g" $f > temp; \mv temp $f
 find . -iname '*scccw*' -depth -exec bash -c 'mv "$1" "${1//scccw/yourprjname}"' -- {} \;
 ```
 
-Solves 95% of my problems. Then lein repl, (reset) and the system is up and running. Customize at will.
+Then lein repl, (reset) and the system is up and running. Customize at will.
 
 Known Limitations: yourprjname needs to be a single word, no spaces no punctuation.
