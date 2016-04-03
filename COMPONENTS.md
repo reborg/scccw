@@ -1,6 +1,10 @@
-# MY COMPONENT "FRAMEWORK"
+# components.md
 
-This is the way I like to organize my Clojure projects these days. It's not a framework by design, because I don't believe in component reuse/sharing. This is the main difference from other components frameworks that enforce a contract (usually in the form of a defrecord) on components. The only thing I use here are conventions. The most important one is that we only want a component when some stateful interaction is involved. Most of the times this stateful part is not even part of our project but it comes from dependencies (connection objects, pool objects, sockets, streams and so on). This stateful part (and only this) is what ends up in the global "def". We don't need to create another record ourself to put in the global state.
+components.md is not a framework and not a library, it is actually this document itself!
+
+The following illustrates the way I like to organize my Clojure projects these days. It's not a framework by design, because I don't believe in components reuse/sharing. When talking about components in this document, I'm referring to the stateful parts of a Clojure application, the way Stuart Sierra first described them, not code reuse in general.
+
+components.md does not enforce a code contract: this is the main difference from other components frameworks that force a defrecord start/stop lifecycle. I use conventions instead. The most important one is that we only want a component when some stateful interaction is involved. Most of the times the stateful "object" is not even part of the project but comes from dependencies (connections, thread pools, sockets, streams and so on). This stateful part (and only this) is what ends up in the global "def". We don't need to create another record ourself to put in the global state.
 
 The recipe is simple: 3 conventional namespaces + 1 namespace each component. Let's get started:
 
