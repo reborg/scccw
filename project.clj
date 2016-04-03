@@ -14,12 +14,9 @@
                  [org.slf4j/slf4j-api "1.7.12"]
                  [org.clojure/tools.logging "0.3.1"]
 
-                 ;; components
-                 [com.stuartsierra/component "0.3.0"]
+                 ;; other stuff
                  [org.clojure/tools.nrepl "0.2.11"]
                  [org.clojure/tools.namespace "0.2.11"]
-
-                 ;; other stuff
 
                  ;; web
                  [http-kit "2.1.19"]

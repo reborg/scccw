@@ -6,61 +6,50 @@ components.md does not enforce a code contract: this is the main difference from
 
 ## install
 
-components.md is not a framework and not a library, it is actually this document itself! Copy paste the parts below and change at will.
+components.md is not a framework and not a library, it is actually this document itself! Copy paste the parts below and change at will. Alternatively, the same code is included in this project.
 
 ## code
 
 The recipe is simple:
 
-* couple of dependencies in project.clj
+* org.clojure/tools.namespace dependency in project.clj
 * 3 conventional namespaces (bootstrap, system and user)
 * 1 namespace each component
 
 Let's get started:
 
-### 1: project.clj
-
-There are a couple of dependencies that you need:
-
-```clojure
-
-:dependencies [[com.stuartsierra/component "0.3.0"]
-               [org.clojure/tools.namespace "0.2.11"]]
-```
-
-### 2: bootstrap
+### 1: bootstrap
 
 The bootstrap namespace contains the only reference to the global system variable. Other namespaces simply require bootstrap and access system to fetch any stateful objects there (db, sockets, connections, etc) Boostrap also contains functions to handle the global state, like (reset).
 
 ```clojure
 (ns bootstrap
-  (:require [clojure.tools.namespace.repl :refer [disable-reload! refresh]]
-            [com.stuartsierra.component :as component]))
+  (:require [clojure.tools.namespace.repl :refer [disable-reload! refresh]]))
 
 (disable-reload!)
 (def system nil)
 (def ^:private initializer nil)
 
+(defprotocol Lifecycle
+  (start [component])
+  (stop [component]))
+
 (defn set-init! [init] (alter-var-root #'initializer (constantly init)))
-(defn- stop-system [s] (when s (component/stop s)))
+(defn- stop-system [s] (when s (stop s)))
 
 (defn init []
   (if-let [init initializer]
     (do (alter-var-root #'system #(do (stop-system %) (init))) :ok)
     (throw (Error. "No system initializer function found."))))
 
-(defn start [] (alter-var-root #'system component/start) :started)
-
-(defn stop [] (alter-var-root #'system stop-system) :stopped)
-
-(defn go [] (init) (start))
-
-(defn clear [] (alter-var-root #'system #(do (stop-system %) nil)) :ok)
-
-(defn reset [] (clear) (refresh :after 'bootstrap/go))
+(defn start! [] (alter-var-root #'system start) :started)
+(defn stop! [] (alter-var-root #'system stop-system) :stopped)
+(defn go! [] (init) (start!))
+(defn clear! [] (alter-var-root #'system #(do (stop-system %) nil)) :ok)
+(defn reset [] (clear!) (refresh :after 'net.reborg.scccw.bootstrap/go!))
 ```
 
-### 3: system
+### 2: system
 
 The system namespace contains the implementation of the lifecycle functions. It contains the logic to retrieve the statuful part (usually Java objects like connections, pools, sockets and so on) from each component. It then stores the actual stateful object in the main system def (in bootstrap). It does so by calling the start/stop function on each component. So system will likely have all components in the require.  System also contains the main function when the application is not running at the REPL. The final output that goes into the bootstrap/system var is a simple map. It contains the only defrecord related to components.
 
@@ -68,15 +57,14 @@ The system namespace contains the implementation of the lifecycle functions. It 
 (ns ^:skip-aot system
   (:gen-class)
   (:require [bootstrap]
-            [com.stuartsierra.component :as component]
             [database]
             [webserver]))
 
 (defrecord MyApp []
-  component/Lifecycle
+  bootstrap/Lifecycle
   (start [this]
     (let [init (-> this
-                   (assoc :db (db/start "configparams"))
+                   (assoc :db (db/start))
                    (assoc :webserver (webserver/start "localhost" 3000)))]
       init))
   (stop [this]
@@ -109,16 +97,16 @@ The user namespace (usually in the /dev folder separated by other production cod
 
 ### 5: one sample component
 
-So, how does a component look like?  It is a simple namespace which contains the logic to connect/disconnect and typical query functions. The stateful part of the component (the connection) ends up in the main system definition (in bootstrap). The stateless query functions can retrieve a connection from bootstrap anytime they need.
+So, how does a component look like? It is a simple namespace which contains the logic to connect/disconnect and any additional functions. The stateful part of the component (the connection) ends up in the main system definition (in bootstrap) through the start function. Other functions can retrieve connection/state from bootstrap anytime they need, like in the "get-all-accounts" example.
 
 ```clojure
-(ns myprj.database
-  (:require [bootstrap :refer [system]]))
+(ns database
+  (:require [bootstrap :refer [system]]
+            [clojure.tools.logging :as log]))
 
 (defn start []
   (try
-    ;; acquire connections here; Then return the "stateful" thing:
-    ;; conn
+    (str "conn")
     (catch Throwable t
       (log/error "Unable to connect to database:" (.getMessage t)))))
 
@@ -129,8 +117,8 @@ So, how does a component look like?  It is a simple namespace which contains the
       (log/error "Unable to stop the connection pool:" (.getMessage t)))))
 
 (defn get-all-accounts []
-  (let [conn (:conn system)]
-    (get-all :account conn)))
+  (let [conn (:db system)]
+    (str "got all accounts from " conn)))
 ```
 
 ## Q&A
