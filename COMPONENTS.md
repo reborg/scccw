@@ -2,7 +2,7 @@
 
 components.md is an extremely simple, convention-based, Clojure project organization.
 
-It's not a framework by design, because I don't believe in components reuse/sharing through libraries. components.md is instead designed around the idea that each project starts from a copy-pasting of a few necessary things to get started. When talking about components in this document, I'm referring to the stateful parts of a Clojure application, not code reuse in general. I do like code reuse in general :)
+It's not a framework by design, because I don't believe in components reuse/sharing through libraries. components.md is instead designed around the idea that each project starts from a copy-pasting of a few necessary things to get started, including components already implemented if necessary. When talking about components in this document, I'm referring to the stateful parts of a Clojure application, not code reuse in general. I do like code reuse in general :)
 
 The principles/conventions/definitions:
 
