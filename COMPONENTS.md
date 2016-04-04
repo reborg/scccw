@@ -1,18 +1,24 @@
 # components.md
 
-The following illustrates the way I like to organize my Clojure projects these days. It's not a framework by design, because I don't believe in components reuse/sharing. When talking about components in this document, I'm referring to the stateful parts of a Clojure application, the way Stuart Sierra first described them, not code reuse in general.
+components.md is an extremely simple, convention-based, Clojure project organization.
 
-components.md does not enforce a code contract: this is the main difference from other components frameworks that force a defrecord start/stop lifecycle. I use conventions instead. The most important one is that we only want a component when some stateful interaction is involved. Most of the times the stateful "object" is not even part of the project but comes from dependencies (connections, thread pools, sockets, streams and so on). This stateful part (and only this) is what ends up in the global "def". We don't need to create another record ourself to put in the global state.
+It's not a framework by design, because I don't believe in components reuse/sharing through libraries. components.md is instead designed around the idea that each project starts from a copy-pasting of a few necessary things to get started. When talking about components in this document, I'm referring to the stateful parts of a Clojure application, not code reuse in general. I do like code reuse in general :)
+
+The principles/conventions/definitions:
+
+* A namespace is stateful if some information needs to survive its reload. If after reloading a namespace you assume that an open connection is still open, then that is a stateful part. "defonce" are good indicators.
+* components.md does not enforce a code contract on components. This is the main difference from other components frameworks that force a defrecord start/stop lifecycle. I use conventions instead.
+* Every part of the code is free to access the global state. No "injections" of other components or declared dependencies.
+* we only want a component when some stateful interaction is involved. Most of the times the stateful "object" is not even part of the project but comes from dependencies (connections, thread pools, sockets, streams and so on). This stateful part (and only this) is what ends up in the global "def". No component should be created if there is nothing stateful about it.
+* components.md is a developing tool only. It's here because when we start a REPL, we don't want to setup connections manually, or remember to clear a few in-memory caches. When switching to prod we bypass this whole setup.
 
 ## install
 
-components.md is not a framework and not a library, it is actually this document itself! Copy paste the parts below and change at will. Alternatively, the same code is included in this project.
+components.md is not a framework nor a library, it is actually this document itself! Copy paste the parts below and change at will. Alternatively, clone this project to see a running example.
 
-## code
+## recipe
 
-The recipe is simple:
-
-* org.clojure/tools.namespace dependency in project.clj
+* 1 org.clojure/tools.namespace dependency in project.clj
 * 3 conventional namespaces (bootstrap, system and user)
 * 1 namespace each component
 
@@ -51,7 +57,7 @@ The bootstrap namespace contains the only reference to the global system variabl
 
 ### 2: system
 
-The system namespace contains the implementation of the lifecycle functions. It contains the logic to retrieve the statuful part (usually Java objects like connections, pools, sockets and so on) from each component. It then stores the actual stateful object in the main system def (in bootstrap). It does so by calling the start/stop function on each component. So system will likely have all components in the require. System also contains the main function when the application is not running at the REPL. The final output that goes into the bootstrap/system var is a simple map. If components have bootstrap dependencies, the start function here is the right place to handle them.
+The system namespace contains the implementation of the lifecycle functions. It contains the logic to retrieve the stateful part (usually Java objects like connections, pools, sockets and so on) from each component. It then stores the actual stateful object in the main system def (in bootstrap). It does so by calling the start/stop function on each component. So system will likely have all components in the require. System also contains the main function when the application is not running at the REPL. The final output that goes into the bootstrap/system var is a simple map. If components have bootstrap dependencies, the start function here is the right place to handle them.
 
 ```clojure
 (ns ^:skip-aot system
