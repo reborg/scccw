@@ -51,7 +51,7 @@ The bootstrap namespace contains the only reference to the global system variabl
 
 ### 2: system
 
-The system namespace contains the implementation of the lifecycle functions. It contains the logic to retrieve the statuful part (usually Java objects like connections, pools, sockets and so on) from each component. It then stores the actual stateful object in the main system def (in bootstrap). It does so by calling the start/stop function on each component. So system will likely have all components in the require.  System also contains the main function when the application is not running at the REPL. The final output that goes into the bootstrap/system var is a simple map. It contains the only defrecord related to components.
+The system namespace contains the implementation of the lifecycle functions. It contains the logic to retrieve the statuful part (usually Java objects like connections, pools, sockets and so on) from each component. It then stores the actual stateful object in the main system def (in bootstrap). It does so by calling the start/stop function on each component. So system will likely have all components in the require. System also contains the main function when the application is not running at the REPL. The final output that goes into the bootstrap/system var is a simple map. If components have bootstrap dependencies, the start function here is the right place to handle them.
 
 ```clojure
 (ns ^:skip-aot system
