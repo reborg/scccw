@@ -80,7 +80,7 @@ The system namespace contains the implementation of the lifecycle functions. It 
   (alter-var-root #'bootstrap/system (fn [_] (.start (create-system)))))
 ```
 
-### 4: user
+### 3: user
 
 The user namespace (usually in the /dev folder separated by other production code in the src folder) brings components functionalities at the REPL exposing the (reset) function.  If you have tests, it will prevent them to reload (and run).
 
@@ -95,7 +95,7 @@ The user namespace (usually in the /dev folder separated by other production cod
 (defn reset [] (binding [clojure.test/*load-tests* false] (b/reset)))
 ```
 
-### 5: one sample component
+### 4: one sample component
 
 So, how does a component look like? It is a simple namespace which contains the logic to connect/disconnect and any additional functions. The stateful part of the component (the connection) ends up in the main system definition (in bootstrap) through the start function. Other functions can retrieve connection/state from bootstrap anytime they need, like in the "get-all-accounts" example.
 
@@ -125,6 +125,8 @@ So, how does a component look like? It is a simple namespace which contains the 
 
 * Q: Why the component doesn't implement a defrecord?
 * A: Personally, I'm not too worried they are not a defrecord. Why do I need to enforce a contract in my own code when I know I need to call a start/stop function?
+* Q: But in your example you have a "defrecord"
+* A: Right, it's the only one and you'll never touch it again. The important thing is that is not forcing YOUR components to do the same. Also: it's there to avoid a circular namespace dependency problem, not as a public interface.
 * Q: What if you need the same component in another project?
 * A: I copy paste. And usually, modify.
 * Q: Argh, copy paste is bad, what if you find a bug in the original code?
