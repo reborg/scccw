@@ -1,16 +1,16 @@
 # components.md
 
-components.md is an extremely simple, convention-based, Clojure project organization.
+components.md is a simple, convention-based, Clojure project organization. components.md is not a library or framework.
 
-It's not a framework by design, because I don't believe in components reuse/sharing through libraries. components.md is instead designed around the idea that each project starts from a copy-pasting of a few necessary things to get started, including components already implemented if necessary. When talking about components in this document, I'm referring to the stateful parts of a Clojure application, not code reuse in general. I do like code reuse in general :)
+I don't believe in components reuse/sharing through libraries, especially in a micro-service environment where duplication positively contributes to evolutionary design (see [Randy Shoup - From the Monolith to Microservices: Lessons from Google and eBay](http://www.ustream.tv/recorded/61479577) for some background). components.md is instead designed around the idea that each project starts from copy-pasting some basic code to get started (including components already implemented in other projects when necessary). When talking about components in this document, I'm referring to the stateful parts of a Clojure application, not code reuse in general. I do like code reuse in general :)
 
 The principles/conventions/definitions:
 
 * A namespace is stateful if some information needs to survive its reload. If after reloading a namespace you assume that an open connection is still open, then that is a stateful part. "defonce" are good indicators.
-* components.md does not enforce a code contract on components. This is the main difference from other components frameworks that force a defrecord start/stop lifecycle. I use conventions instead.
-* Every part of the code is free to access the global state. No "injections" of other components or declared dependencies.
+* components.md is a developing tool only. It's here because when we start a REPL, we don't want to setup connections manually, or remember to clear a few in-memory caches. When switching to prod we bootstrap once and forget about components lifecycle.
+* components.md does not enforce a code contract on your components, it enforces a convention (that you can change). This is the main difference from other components frameworks that force a defrecord start/stop lifecycle.
+* Every part of the code is free to access the global state. No "injections" of other components or declared dependencies. Just a "require" and the global state is available to you.
 * we only want a component when some stateful interaction is involved. Most of the times the stateful "object" is not even part of the project but comes from dependencies (connections, thread pools, sockets, streams and so on). This stateful part (and only this) is what ends up in the global "def". No component should be created if there is nothing stateful about it.
-* components.md is a developing tool only. It's here because when we start a REPL, we don't want to setup connections manually, or remember to clear a few in-memory caches. When switching to prod we bypass this whole setup.
 
 ## install
 
