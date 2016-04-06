@@ -138,4 +138,4 @@ So, how does a component look like? It is a simple namespace which contains the 
 * Q: Argh, copy paste is bad, what if you find a bug in the original code?
 * A: I fix it in all projects. Once stable, it won't change anymore.
 * Q: But this is bad, this is not scalable!
-* A: You see, this all idea of reusable libraries of components never worked and it gets complicated pretty fast. See the past 20 years of OO frameworks.  Do you really want a Spring/J2EE in your beautiful Clojure app?
+* A: You see, this all idea of reusable libraries of components never scale well and it gets complicated pretty fast. See the past 20 years of Java frameworks. Do you really want a Spring/J2EE in your beautiful Clojure app?
